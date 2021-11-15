@@ -1,0 +1,297 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "DOA REST API",
+    "version": "0.0.0",
+    "title": "DOA:API",
+    "contact": {
+      "email": "ashteynikov@tcinet.ru"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://lhs.doinet.ru/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "/handles",
+      "description": "Основные методы работы с DOA API"
+    },
+    {
+      "name": "/sessions",
+      "description": "Взаимодействие с Sessions API"
+    }
+  ],
+  "paths": {
+    "/handles/{handle}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "handle",
+          "description": "Хэндл, для которого выполняется запрос.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "pretty",
+          "description": "Ответ будет возвращаться в формате pretty.",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          },
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "callback",
+          "description": "Позволяет использовать JSONP, ответ будет обернут в {callback}(...).",
+          "schema": {
+            "type": "string"
+          },
+          "required": false
+        }
+      ],
+      "get": {
+        "tags": [
+          "/handles"
+        ],
+        "summary": "Резолвинг хэндла",
+        "description": "Производит резолвинг записи хэндла для данного хэндла.",
+        "operationId": "resolveHandle",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "index",
+            "description": "Определяет индекс, значение под которым будет возвращено, может использоваться многократно, если такой индекс имеют несколько значений, все они возвращаются.",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "Определяет тип, значение которого будет возвращено, может использоваться многократно, если такой тип имеют несколько значений, все они возвращаются.",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "auth",
+            "description": "Если истинно, то значения из кэша должно быть проигнорировано, а запрос отправлен на основной сервер.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "publicOnly",
+            "description": "Если истинно, то должны быть возвращены только значения доступные для публичного чтения. По умолчанию истинно для неавторизованных запросов, ложно для авторищованных.",
+            "schema": {
+              "type": "boolean"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Pet not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "/handles"
+        ],
+        "summary": "Создание или модификация хэндла",
+        "description": "Создает хэндл или изменяет его запись, если в параметрах запроса указаны индексы, то создает или заменяет значения, соответствующие этим индексам, в записи хэндла.",
+        "operationId": "putHandle",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "index",
+            "description": "Определяет индекс, значение под которым будет добавлено или изменено, может использоваться многократно, индексы должны совпадать с индексами передаваемых значений. Может иметь значение 'various', означающее, что все переданные значение должны быть добавлены или изменены.",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "overwrite",
+            "description": "Если истинно, то заменяет уже существующие значения, иначе при попытке изменить существующие значение вернет ошибку 409 Conflict.",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "mintNewSuffix",
+            "description": "Если истинно, то создаваемый хэндл будет получен добавлением случайно сгенерированной строки к параметру {handle}, символ '/' должен входить в параметр {handle}.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Pet not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "/handles"
+        ],
+        "summary": "Удаление хэндла",
+        "description": "Удаляет хэндл, если в параметрах запроса указаны индексы, то удаляет значения, соответствующие этим индексам, в записи хэндла.",
+        "operationId": "deleteHandle",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "index",
+            "description": "Определяет индекс, значение под которым будет удалено, может использоваться многократно.",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Pet not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        }
+      }
+    },
+    "/handles": {
+      "get": {
+        "tags": [
+          "/handles"
+        ],
+        "summary": "Получение списка хэндлов под определенным префиксом",
+        "description": "Получает список хэндлов, зарегистрированных под определенным индексом, передаваемым в параметрах запроса.",
+        "operationId": "updatePet",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "prefix",
+            "description": "Префикс, для которого выполняется запрос",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Pet not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "tags": [
+          "/sessions"
+        ],
+        "summary": "Инициирование сессии",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "initiateSession",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/sessions/this": {
+      "get": {
+        "tags": [
+          "/sessions"
+        ],
+        "summary": "Верификация сессии",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "verifySession",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "/sessions"
+        ],
+        "summary": "Аутентификация в сессии",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "authenticateSession",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "/sessions"
+        ],
+        "summary": "Удаление сессии",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "DeleteSession",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    }
+  }
+}
